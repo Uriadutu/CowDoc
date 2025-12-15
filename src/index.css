@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff; /* thumb putih */
+  border: 2px solid #04bd51; /* border hijau */
+  cursor: pointer;
+  margin-top: -9px; /* sesuaikan agar thumb di tengah track */
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 1px;
+  height: 1px;
+  border-radius: 10%;
+  background: #ffffff;
+  border: 1px solid red;
+  cursor: pointer;
+}
+
+input[type="range"]::-ms-thumb {
+  width: 1px;
+  height: 1px;
+  border-radius: 10%;
+  background: #ffffff;
+  border: 1px solid #04bd51;
+  cursor: pointer;
+}
+
+.btn-add {
+  @apply px-3 py-2 mb-0 bg-[#04BD51] text-white font-semibold text-sm rounded shadow-md hover:bg-[#0bd45f] transition duration-300;
+}
+
+.heading {
+  @apply text-gray-700 text-2xl font-bold mb-5;
+}
+.btn-batal {
+  @apply px-3 py-2 mb-0 bg-white border border-gray-300 text-black text-sm rounded-md hover:bg-gray-100 transition duration-300;
+}
+
+.input {
+  @apply p-2 border border-gray-200 rounded-md text-sm;
+}
+
+.label-input {
+  @apply text-black mb-2 mt-1 font-semibold;
+}
+
+.btn-simpan {
+  @apply px-3 py-2 mb-0 bg-[#E7C057] text-white font-semibold text-sm rounded-md hover:bg-[#f3ce68] transition duration-300;
+}
+
+.detail {
+  @apply py-1 px-3 text-gray-200 text-xs bg-[#424242] hover:bg-[#2c2c2c] border border-gray-600 rounded;
+}
+.edit {
+  @apply py-1 px-3 text-gray-200 text-xs bg-[#424242] hover:bg-[#2c2c2c] border border-gray-600 rounded;
+}
+
+.delete {
+  @apply py-1 px-3 text-gray-200 text-xs bg-[#424242] hover:bg-[#2c2c2c] border border-gray-600 rounded;
+}
