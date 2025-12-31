@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 const TentukanNilaiCFModal = ({ isOpen, onClose, gejalaList, onSubmit }) => {
   const [nilaiCF, setNilaiCF] = useState({});
 
+  console.log(nilaiCF);
+  
+
   useEffect(() => {
     if (isOpen && gejalaList.length) {
       const init = {};

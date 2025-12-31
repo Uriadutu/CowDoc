@@ -14,6 +14,12 @@ const BasisAturanModal = ({ setIsOpenModal, getData }) => {
   const [rekomOptions, setRekomOptions] = useState([]);
   const [selectedRekom, setSelectedRekom] = useState([]);
 
+  const sortByKode = (a, b) => {
+    const numA = parseInt(a.kode.replace(/\D/g, ""), 10);
+    const numB = parseInt(b.kode.replace(/\D/g, ""), 10);
+    return numA - numB;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -256,11 +262,13 @@ const BasisAturanModal = ({ setIsOpenModal, getData }) => {
                       className="col-span-4 px-3 py-2 border rounded-lg"
                     >
                       <option value="">Pilih Gejala</option>
-                      {getAvailableGejala(item.gejala).map((g, i) => (
-                        <option key={g.id} value={g.id}>
-                          {g.kode} — {g.nama}
-                        </option>
-                      ))}
+                      {getAvailableGejala(item.gejala)
+                        .sort(sortByKode)
+                        .map((g) => (
+                          <option key={g.id} value={g.id}>
+                            {g.kode} — {g.nama}
+                          </option>
+                        ))}
                     </select>
 
                     <select

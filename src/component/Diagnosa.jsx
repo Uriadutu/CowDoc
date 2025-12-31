@@ -15,6 +15,7 @@ const Diagnosa = () => {
   const [openCF, setOpenCF] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  
   // Ambil daftar gejala
   useEffect(() => {
     const fetchGejala = async () => {
@@ -35,52 +36,83 @@ const Diagnosa = () => {
   };
 
   // Perhitungan CF berdasarkan gejala_penyakit
-  const hitungCF = async (cfUser) => {
-    const snap = await getDocs(collection(db, "gejala_penyakit"));
-    const semuaPenyakit = snap.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+ const hitungCF = async (cfUser) => {
+  const snap = await getDocs(collection(db, "gejala_penyakit"));
 
-    let hasil = [];
+  const semuaPenyakit = snap.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
 
-    semuaPenyakit.forEach((penyakit) => {
-      const list = penyakit.gejalaList || [];
-      const gejalaPenyakit = list.map((g) => g.gejala);
+  console.log("📦 DATA gejala_penyakit:", semuaPenyakit);
 
-      // cek apakah setidaknya ada 1 gejala user yang ada di penyakit ini
-      const cocok = selectedItems.some((g) => gejalaPenyakit.includes(g.nama));
-      if (!cocok) return;
+  let hasil = [];
 
-      let cfGabungan = 0;
+  semuaPenyakit.forEach((penyakit) => {
+    const list = penyakit.gejalaList || [];
 
-      selectedItems.forEach((g, idx) => {
-        const pakar = list.find((x) => x.gejala === g.nama);
-        if (!pakar) return; // skip jika gejala user tidak ada di penyakit ini
-        const cfPakar = parseFloat(pakar.cf) || 0;
-        const cfUserVal = cfUser[g.id] || 0;
-        const cf = cfPakar * cfUserVal;
+    // ambil semua gejalaId penyakit
+    const gejalaPenyakitIds = list.map((g) => g.gejalaId);
 
-        if (idx === 0) cfGabungan = cf;
-        else cfGabungan = cfGabungan + cf * (1 - cfGabungan);
+    // cek minimal 1 gejala user cocok
+    const cocok = selectedItems.some((g) =>
+      gejalaPenyakitIds.includes(g.id)
+    );
+    if (!cocok) return;
+
+    let cfGabungan = 0;
+    let isFirst = true;
+
+    selectedItems.forEach((g) => {
+      // cari gejala pakar BERDASARKAN gejalaId
+      const pakar = list.find(
+        (x) => x.gejalaId === g.id
+      );
+      if (!pakar) return;
+
+      const cfPakar = Number(pakar.cf) || 0;
+      const cfUserVal = Number(cfUser[g.id]) || 0;
+      const cf = cfPakar * cfUserVal;
+
+      console.log("🧮 HITUNG CF:", {
+        penyakitId: penyakit.penyakitId,
+        gejalaId: g.id,
+        kode_gejala: pakar.kode_gejala,
+        cfPakar,
+        cfUserVal,
+        hasil: cf,
       });
 
-      hasil.push({
-        penyakit: penyakit.penyakit, // nama penyakit
-        gejalaList: list.map((g) => ({ gejala: g.gejala, cf: g.cf })),
-        rekomendasiList: penyakit.rekomendasiList || [],
-        cf: cfGabungan,
-      });
+      if (isFirst) {
+        cfGabungan = cf;
+        isFirst = false;
+      } else {
+        cfGabungan = cfGabungan + cf * (1 - cfGabungan);
+      }
     });
 
-    // Urutkan berdasarkan cf terbesar
-    hasil.sort((a, b) => b.cf - a.cf);
-    return hasil;
-  };
+    hasil.push({
+      penyakitId: penyakit.penyakitId,
+      cf: cfGabungan,
+      gejalaList: list,
+      rekomendasiList: penyakit.rekomendasiList || [],
+    });
+  });
+
+  hasil.sort((a, b) => b.cf - a.cf);
+
+  console.log("🏆 HASIL AKHIR:", hasil);
+  return hasil;
+};
+
+
+  useEffect(() => {
+    hitungCF();
+  }, []);
 
   const handleNext = () => {
-    if (selectedItems.length < 2) {
-      alert("Pilih minimal 2 gejala.");
+    if (selectedItems.length < 3) {
+      alert("Pilih minimal 3 gejala.");
       return;
     }
     setOpenCF(true);
@@ -88,6 +120,7 @@ const Diagnosa = () => {
 
   const handleSelectCF = async (cfUser) => {
     const hasilCF = await hitungCF(cfUser);
+    console.log(cfUser);
 
     navigate("/hasil-diagnosa", {
       state: {
@@ -107,7 +140,7 @@ const Diagnosa = () => {
           <p className="ml-1">Panduan Pengisian</p>
         </div>
         <p className="pl-2">
-          Pilih gejala yang terlihat. Pilih minimal 2 gejala untuk hasil yang
+          Pilih gejala yang terlihat. Pilih minimal 3 gejala untuk hasil yang
           akurat.
         </p>
       </div>
@@ -119,7 +152,7 @@ const Diagnosa = () => {
         ) : gejalaList.length === 0 ? (
           <p className="text-center py-4 text-gray-500">Tidak ada gejala.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-5 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-5">
             {gejalaList.map((item) => (
               <div
                 key={item.id}
@@ -135,7 +168,7 @@ const Diagnosa = () => {
                     <FaCheckCircle />
                   </div>
                 )}
-                <p className="text-center">{item.nama}</p>
+                <p className="text-center text-sm">{item.nama}</p>
               </div>
             ))}
           </div>
@@ -144,7 +177,7 @@ const Diagnosa = () => {
 
       {/* Button */}
       {selectedItems.length > 0 && (
-        <div className="flex justify-end mt-4">
+        <div className="flex justify-end mt-4 sticky bottom-7">
           <button
             onClick={handleNext}
             className="bg-[#467D40] text-white px-5 py-2 rounded-lg hover:bg-[#32ba47] transition"
