@@ -36,27 +36,25 @@ const TentukanNilaiCFModal = ({ isOpen, onClose, gejalaList, onSubmit }) => {
         </h2>
 
         <div className="mt-1 rounded-md max-h-[60vh] p-4 bg-white overflow-y-auto border border-[#04BD51]">
-          <div className="grid grid-cols-4 px-2">
-            <div className="col-span-1 text-center">
+          <div className="grid grid-cols-5 px-2">
+            <div className="col-span-3 text-center ">
               <p className="border-b border-[#04BD51] pb-1">
                 Gejala Yang Dipilih
               </p>
             </div>
-            <div className="col-span-2 text-center"></div>
-            <div className="col-span-1 text-center">
+            <div className="col-span-2 text-center">
               <p className="border-b border-[#04BD51] pb-1">
-                Tingkat Keyakinan
+                Keyakinan
               </p>
             </div>
           </div>
 
           {gejalaList.map((g) => (
-            <div key={g.id} className="grid grid-cols-4 px-2 items-center">
-              <div className="col-span-1 text-center">
-                <p className="pb-1">{g.nama}</p>
+            <div key={g.id} className="grid grid-cols-5 px-2 items-center border-b gap-2 ">
+              <div className="col-span-3 text-left">
+                <p className="pb-1 pr-1">{g.nama}</p>
               </div>
-              <div className="col-span-2 text-center"></div>
-              <div className="col-span-1 text-center">
+              <div className="col-span-2 text-center">
                 <div className="flex items-center gap-3">
                   <input
                     type="range"
