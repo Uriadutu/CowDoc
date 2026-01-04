@@ -10,6 +10,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { IoSearch, IoEye } from "react-icons/io5";
+import RiwayatUser from "./user/RiwayatUser";
 import RiwayatAdmin from "./admin/RiwayatAdmin";
 
 const Riwayat = () => {
@@ -41,7 +42,7 @@ const Riwayat = () => {
       {role === "Admin" ? (
        <RiwayatAdmin/>
       ) : (
-        <div className="">Lol</div>
+        <RiwayatUser/>
       )}
     </div>
   );

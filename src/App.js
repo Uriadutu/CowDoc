@@ -16,6 +16,7 @@ import DataGejalaPage from "./pages/DataGejalaPage";
 import RekomendasiPengobatanPage from "./pages/RekomendasiPengobatanPage";
 import BasisAturanPage from "./pages/BasisAturanPage";
 import HasilDIagnosaPage from "./pages/HasilDIagnosaPage";
+import RiwayatPeruserPage from "./pages/RiwayatPeruserPage";
 function App() {
   return (
     <BrowserRouter>
@@ -40,6 +41,22 @@ function App() {
           element={
             <ProtectedRoute>
               <DiagnosaPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/riwayat-diagnosis"
+          element={
+            <ProtectedRoute>
+              <RiwayatPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/riwayat-diagnosis/:id/:nama"
+          element={
+            <ProtectedRoute>
+              <RiwayatPeruserPage />
             </ProtectedRoute>
           }
         />
