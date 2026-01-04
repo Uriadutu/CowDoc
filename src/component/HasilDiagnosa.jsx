@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../auth/Firebase";
@@ -12,8 +12,8 @@ const HasilDiagnosa = () => {
   const [loading, setLoading] = useState(true);
   const [openRekomendasi, setOpenRekomendasi] = useState({});
 
-  // ✅ AMAN dari eslint (tidak conditional)
   const hasilCF = state?.hasilCF || [];
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,7 +25,7 @@ const HasilDiagnosa = () => {
       try {
         const hasilDenganNama = await Promise.all(
           hasilCF.map(async (row) => {
-            // ambil nama penyakit
+            // Ambil nama penyakit
             let namaPenyakit = "Tidak diketahui";
             try {
               const penyakitRef = doc(db, "penyakit", row.penyakitId);
@@ -37,32 +37,30 @@ const HasilDiagnosa = () => {
               console.error("Gagal ambil penyakit:", err);
             }
 
-            // ambil nama rekomendasi
-            // ambil rekomendasi (isi + jenis)
+            // Ambil rekomendasi
             let rekomendasiDetail = [];
-            if (row.rekomendasiList && row.rekomendasiList.length > 0) {
-              rekomendasiDetail = await Promise.all(
-                row.rekomendasiList.map(async (id) => {
-                  try {
-                    const ref = doc(db, "rekomendasi", id);
-                    const snap = await getDoc(ref);
-                    if (snap.exists()) {
-                      const data = snap.data();
-                      return {
-                        isi: data.isi,
-                        jenis: data.jenis,
-                      };
+            if (row.rekomendasiList?.length > 0) {
+              rekomendasiDetail = (
+                await Promise.all(
+                  row.rekomendasiList.map(async (id) => {
+                    try {
+                      const ref = doc(db, "rekomendasi", id);
+                      const snap = await getDoc(ref);
+                      if (snap.exists()) {
+                        const data = snap.data();
+                        return {
+                          isi: data.isi,
+                          jenis: data.jenis,
+                        };
+                      }
+                      return null;
+                    } catch (err) {
+                      console.error("Gagal ambil rekomendasi:", err);
+                      return null;
                     }
-                    return null;
-                  } catch (err) {
-                    console.error("Gagal ambil rekomendasi:", err);
-                    return null;
-                  }
-                })
-              );
-
-              // buang null
-              rekomendasiDetail = rekomendasiDetail.filter(Boolean);
+                  })
+                )
+              ).filter(Boolean);
             }
 
             return {
@@ -87,9 +85,8 @@ const HasilDiagnosa = () => {
   if (!state || !state.hasilCF) {
     return <p className="text-center mt-10">Tidak ada hasil.</p>;
   }
-
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold text-[#467D40] mb-6 text-center">
         Hasil Diagnosa
       </h1>
@@ -142,9 +139,7 @@ const HasilDiagnosa = () => {
                       }
                       className="font-semibold text-[#467D40] mb-2"
                     >
-                      {openRekomendasi[i]
-                        ? "Tutup"
-                        : "Lihat Rekomendasi"}
+                      {openRekomendasi[i] ? "Tutup" : "Lihat Rekomendasi"}
                     </button>
 
                     {/* Dropdown */}

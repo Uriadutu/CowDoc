@@ -1,7 +1,7 @@
 // Diagnosa.jsx
 import React, { useState, useEffect } from "react";
-import { getDocs, collection } from "firebase/firestore";
-import { db } from "../auth/Firebase";
+import { getDocs, addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db, auth } from "../auth/Firebase";
 import TentukanNilaiCFModal from "./modals/TentukanNilaiCFModal";
 import { useNavigate } from "react-router-dom";
 import { IoWarningOutline } from "react-icons/io5";
@@ -15,7 +15,6 @@ const Diagnosa = () => {
   const [openCF, setOpenCF] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  
   // Ambil daftar gejala
   useEffect(() => {
     const fetchGejala = async () => {
@@ -36,75 +35,59 @@ const Diagnosa = () => {
   };
 
   // Perhitungan CF berdasarkan gejala_penyakit
- const hitungCF = async (cfUser) => {
-  const snap = await getDocs(collection(db, "gejala_penyakit"));
+  const hitungCF = async (cfUser) => {
+    const snap = await getDocs(collection(db, "gejala_penyakit"));
 
-  const semuaPenyakit = snap.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
+    const semuaPenyakit = snap.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-  console.log("📦 DATA gejala_penyakit:", semuaPenyakit);
 
-  let hasil = [];
+    let hasil = [];
 
-  semuaPenyakit.forEach((penyakit) => {
-    const list = penyakit.gejalaList || [];
+    semuaPenyakit.forEach((penyakit) => {
+      const list = penyakit.gejalaList || [];
 
-    // ambil semua gejalaId penyakit
-    const gejalaPenyakitIds = list.map((g) => g.gejalaId);
+      // ambil semua gejalaId penyakit
+      const gejalaPenyakitIds = list.map((g) => g.gejalaId);
 
-    // cek minimal 1 gejala user cocok
-    const cocok = selectedItems.some((g) =>
-      gejalaPenyakitIds.includes(g.id)
-    );
-    if (!cocok) return;
+      // cek minimal 1 gejala user cocok
+      const cocok = selectedItems.some((g) => gejalaPenyakitIds.includes(g.id));
+      if (!cocok) return;
 
-    let cfGabungan = 0;
-    let isFirst = true;
+      let cfGabungan = 0;
+      let isFirst = true;
 
-    selectedItems.forEach((g) => {
-      // cari gejala pakar BERDASARKAN gejalaId
-      const pakar = list.find(
-        (x) => x.gejalaId === g.id
-      );
-      if (!pakar) return;
+      selectedItems.forEach((g) => {
+        // cari gejala pakar BERDASARKAN gejalaId
+        const pakar = list.find((x) => x.gejalaId === g.id);
+        if (!pakar) return;
 
-      const cfPakar = Number(pakar.cf) || 0;
-      const cfUserVal = Number(cfUser[g.id]) || 0;
-      const cf = cfPakar * cfUserVal;
+        const cfPakar = Number(pakar.cf) || 0;
+        const cfUserVal = Number(cfUser[g.id]) || 0;
+        const cf = cfPakar * cfUserVal;
 
-      console.log("🧮 HITUNG CF:", {
-        penyakitId: penyakit.penyakitId,
-        gejalaId: g.id,
-        kode_gejala: pakar.kode_gejala,
-        cfPakar,
-        cfUserVal,
-        hasil: cf,
+        if (isFirst) {
+          cfGabungan = cf;
+          isFirst = false;
+        } else {
+          cfGabungan = cfGabungan + cf * (1 - cfGabungan);
+        }
       });
 
-      if (isFirst) {
-        cfGabungan = cf;
-        isFirst = false;
-      } else {
-        cfGabungan = cfGabungan + cf * (1 - cfGabungan);
-      }
+      hasil.push({
+        penyakitId: penyakit.penyakitId,
+        cf: cfGabungan,
+        gejalaList: list,
+        rekomendasiList: penyakit.rekomendasiList || [],
+      });
     });
 
-    hasil.push({
-      penyakitId: penyakit.penyakitId,
-      cf: cfGabungan,
-      gejalaList: list,
-      rekomendasiList: penyakit.rekomendasiList || [],
-    });
-  });
+    hasil.sort((a, b) => b.cf - a.cf);
 
-  hasil.sort((a, b) => b.cf - a.cf);
-
-  console.log("🏆 HASIL AKHIR:", hasil);
-  return hasil;
-};
-
+    return hasil;
+  };
 
   useEffect(() => {
     hitungCF();
@@ -118,16 +101,48 @@ const Diagnosa = () => {
     setOpenCF(true);
   };
 
-  const handleSelectCF = async (cfUser) => {
-    const hasilCF = await hitungCF(cfUser);
-    console.log(cfUser);
+const handleSelectCF = async (cfUser) => {
+  const user = auth.currentUser;
+  if (!user) return;
 
-    navigate("/hasil-diagnosa", {
-      state: {
-        hasilCF,
-      },
+  const hasilCF = await hitungCF(cfUser);
+
+  // 🔐 SIMPAN RIWAYAT DI SINI (1x SAJA)
+  try {
+    const gejalaDipilih = selectedItems.map((g) => ({
+      gejalaId: g.id,
+      nama: g.nama,
+      cfUser: cfUser[g.id] || 0,
+    }));
+
+    const hasilDiagnosis = hasilCF.map((row) => ({
+      penyakitId: row.penyakitId,
+      cf: row.cf,
+      rekomendasiList: row.rekomendasiList || [],
+    }));
+
+    await addDoc(collection(db, "riwayat_diagnosis"), {
+      userId: user.uid,
+      createdAt: serverTimestamp(),
+      gejalaDipilih,
+      hasil: hasilDiagnosis,
     });
-  };
+
+    console.log("✅ Riwayat diagnosis tersimpan");
+  } catch (err) {
+    console.error("❌ Gagal simpan riwayat:", err);
+  }
+
+  // ➡️ NAVIGASI (TANPA SIMPAN LAGI)
+  navigate("/hasil-diagnosa", {
+    state: {
+      hasilCF,
+      selectedGejala: selectedItems,
+      cfUser,
+    },
+  });
+};
+
 
   return (
     <div className="p-6">
