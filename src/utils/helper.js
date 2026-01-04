@@ -14,6 +14,13 @@ export function capitalizeWords(text) {
     .join(" ");
 }
 
+export const formatNamaPenyakit = (nama = "") => {
+  if (!nama) return "-";
+
+  return nama.split("(")[0].split("/")[0].trim();
+};
+
+
 export function formatTanggal(dateInput) {
   const date = new Date(dateInput);
 

@@ -114,7 +114,7 @@ const RekomendasiPengobatan = () => {
                   <td className="border px-4 py-2 text-center">{index + 1}</td>
                   <td className="border px-4 py-2">{rek.isi}</td>
                   <td className="border px-4 py-2">{rek.jenis}</td>
-                  <td className="border px-4 py-2">
+                  <td className="border px-4 py-2 flex">
                     <button
                       onClick={() => handleEdit(rek)}
                       className="text-white bg-blue-500 p-1 mr-2"
