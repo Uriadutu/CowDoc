@@ -4,6 +4,10 @@ import { db } from "../../auth/Firebase";
 
 import Diagnosis from "../../img/Diagnosis.png";
 import PMK from "../../img/Pmk.png";
+import User from "../../img/User.png";
+import Penyakit from "../../img/Penyakit.png";
+import Gejala from "../../img/Gejala.png";
+
 import { formatNamaPenyakit } from "../../utils/helper";
 
 const BerandaAdmin = () => {
@@ -69,7 +73,7 @@ const BerandaAdmin = () => {
             <p className="text-6xl mt-6">{jumlahPenyakit}</p>
             <p className="text-xl mt-3">Jumlah Penyakit</p>
           </div>
-          <img src={Diagnosis} className="h-full object-contain m-1" alt="" />
+          <img src={Penyakit} className="h-full object-contain m-1 opacity-30" alt="" />
         </div>
 
         {/* Jumlah Gejala */}
@@ -78,7 +82,7 @@ const BerandaAdmin = () => {
             <p className="text-6xl mt-6">{jumlahGejala}</p>
             <p className="text-xl mt-3">Jumlah Gejala</p>
           </div>
-          <img src={Diagnosis} className="h-full object-contain m-1" alt="" />
+          <img src={Gejala} className="h-full object-contain m-1 opacity-30" alt="" />
         </div>
 
         {/* Jumlah Pengguna */}
@@ -87,7 +91,7 @@ const BerandaAdmin = () => {
             <p className="text-6xl mt-6">{jumlahUser}</p>
             <p className="text-xl mt-3">Jumlah Pengguna</p>
           </div>
-          <img src={Diagnosis} className="h-full object-contain m-1" alt="" />
+          <img src={User} className="h-full object-contain m-1 " alt="" />
         </div>
 
         {/* Jumlah Diagnosis */}
@@ -96,7 +100,7 @@ const BerandaAdmin = () => {
             <p className="text-6xl mt-6">{jumlahDiagnosis}</p>
             <p className="text-xl mt-3">Jumlah Diagnosis</p>
           </div>
-          <img src={Diagnosis} className="h-full object-contain m-1" alt="" />
+          <img src={Diagnosis} className="h-full object-contain m-1 opacity-30" alt="" />
         </div>
 
         {/* Penyakit Paling Sering */}
@@ -108,7 +112,7 @@ const BerandaAdmin = () => {
             </div>
             <img
               src={PMK}
-              className="h-full object-contain m-1 top-0 right-0 absolute"
+              className="h-full object-contain m-[0.02px] top-0 right-0 absolute"
               alt=""
             />
           </div>

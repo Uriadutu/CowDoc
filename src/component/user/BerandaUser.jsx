@@ -75,7 +75,7 @@ const BerandaUser = () => {
             <p className="text-6xl mt-6">{jumlahDiagnosis}</p>
             <p className="text-xl mt-3">Jumlah Diagnosis</p>
           </div>
-          <img src={Diagnosis} className="h-full object-contain m-1" alt="" />
+          <img src={Diagnosis} className="h-full object-contain m-1 opacity-100 " alt="" />
         </div>
 
         {/* Penyakit Terbanyak */}
