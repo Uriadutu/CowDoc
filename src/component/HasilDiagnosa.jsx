@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../auth/Firebase";
@@ -13,10 +13,7 @@ const HasilDiagnosa = () => {
   const [openRekomendasi, setOpenRekomendasi] = useState({});
 
   const hasilCF = state?.hasilCF || [];
-  console.log(dataRiwayat);
   
-
-
   useEffect(() => {
     const fetchData = async () => {
       if (!hasilCF || hasilCF.length === 0) {

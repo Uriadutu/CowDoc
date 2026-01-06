@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../img/NamaAPk.png";
-import { auth, db } from "../auth/Firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { auth } from "../auth/Firebase";
 
 const Sidebar = () => {
   const navigate = useNavigate();

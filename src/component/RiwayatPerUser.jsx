@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { auth, db } from "../auth/Firebase";
+import {  db } from "../auth/Firebase";
 import {
   collection,
   getDocs,
@@ -21,11 +21,15 @@ const RiwayatPerUser = () => {
   const [selectedRiwayat, setSelectedRiwayat] = useState(null);
   const { id, nama } = useParams();
 
-  const fetchRiwayat = async () => {
+   useEffect(() => {
+    fetchRiwayat(id);
+  }, [id]);
+
+  const fetchRiwayat = async (idUser) => {
     try {
       const q = query(
         collection(db, "riwayat_diagnosis"),
-        where("userId", "==", id)
+        where("userId", "==", idUser)
       );
 
       const snap = await getDocs(q);
@@ -60,7 +64,6 @@ const RiwayatPerUser = () => {
         })
       );
 
-      // 🔥 SORT: terbaru → terlama
       const sortedData = data.sort((a, b) => b.tanggalAsli - a.tanggalAsli);
 
       setDataRiwayat(sortedData);
@@ -71,9 +74,7 @@ const RiwayatPerUser = () => {
     }
   };
 
-  useEffect(() => {
-    fetchRiwayat();
-  }, []);
+ 
 
   const filteredData = dataRiwayat.filter((r) =>
     r.penyakit.toLowerCase().includes(searchTerm.toLowerCase())

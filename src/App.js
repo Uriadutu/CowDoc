@@ -1,16 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/userPage/HomePage";
 import Splash from "./component/user/Splash";
 import Login from "./component/Login";
-import HasilPerhitunganPage from "./pages/userPage/HasilPerhitunganPage";
 import ProtectedRoute from "./ProtectedRoute";
-import CobaPerhitunganPage from "./pages/CobaPerhitunganPage";
-import HasilCobaPerhitunganPage from "./pages/HasilCobaPerhitunganPage";
 import Regis from "./component/Regis";
 import BerandaPage from "./pages/BerandaPage";
 import DiagnosaPage from "./pages/DiagnosaPage";
 import RiwayatPage from "./pages/RiwayatPage";
-import BantuanPage from "./pages/BantuanPage";
 import DataPenyakitPage from "./pages/DataPenyakitPage";
 import DataGejalaPage from "./pages/DataGejalaPage";
 import RekomendasiPengobatanPage from "./pages/RekomendasiPengobatanPage";
@@ -24,9 +19,6 @@ function App() {
         <Route path="/" element={<Splash />} />
         <Route path="/masuk" element={<Login />} />
         <Route path="/daftar" element={<Regis />} />
-
-        {/* <Route path="/kelola" element={<KelolaDataPage />} /> */}
-        <Route path="/home" element={<HomePage />} />
         {/* Protected routes */}
         <Route
           path="/beranda"
@@ -65,14 +57,6 @@ function App() {
           element={
             <ProtectedRoute>
               <RiwayatPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/bantuan"
-          element={
-            <ProtectedRoute>
-              <BantuanPage />
             </ProtectedRoute>
           }
         />
