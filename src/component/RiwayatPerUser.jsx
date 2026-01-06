@@ -11,7 +11,7 @@ import {
 import { IoSearch, IoEye } from "react-icons/io5";
 import { formatTanggal } from "../utils/helper";
 import RiwayatModal from "./modals/RiwayatModal";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const RiwayatPerUser = () => {
   const [dataRiwayat, setDataRiwayat] = useState([]);
@@ -19,9 +19,7 @@ const RiwayatPerUser = () => {
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [selectedRiwayat, setSelectedRiwayat] = useState(null);
-  const {id, nama} = useParams();
-
-  console.log(dataRiwayat);
+  const { id, nama } = useParams();
 
   const fetchRiwayat = async () => {
     try {
@@ -52,7 +50,8 @@ const RiwayatPerUser = () => {
 
           return {
             id: docSnap.id,
-            tanggal: formatTanggal(d.createdAt.toDate()),
+            tanggal: formatTanggal(d.createdAt.toDate()), // untuk ditampilkan
+            tanggalAsli: d.createdAt.toDate(), // untuk sorting
             penyakit: namaPenyakit,
             cf: hasilTerbesar.cf,
             jumlahGejala: d.gejalaDipilih.length,
@@ -61,7 +60,10 @@ const RiwayatPerUser = () => {
         })
       );
 
-      setDataRiwayat(data);
+      // 🔥 SORT: terbaru → terlama
+      const sortedData = data.sort((a, b) => b.tanggalAsli - a.tanggalAsli);
+
+      setDataRiwayat(sortedData);
     } catch (err) {
       console.error(err);
     } finally {
@@ -87,7 +89,10 @@ const RiwayatPerUser = () => {
         </span>
       </h1>
 
-      <div className="flex justify-end mb-2">
+      <div className="flex justify-between mb-2">
+        <Link to={-1} className="btn-batal" >
+          Kembali
+        </Link>
         <div className="flex p-2 border rounded border-gray-200 items-center bg-white">
           <input
             type="text"
@@ -125,7 +130,7 @@ const RiwayatPerUser = () => {
                   <td className="border px-4 py-2">{r.tanggal}</td>
                   <td className="border px-4 py-2 font-medium">{r.penyakit}</td>
                   <td className="border px-4 py-2 text-red-500 font-bold">
-                    {(r.cf * 100).toFixed(0)}%
+                    {(r.cf * 100).toFixed(2)}%
                   </td>
                   <td className="border px-4 py-2">{r.jumlahGejala}</td>
                   <td className="border px-4 py-2">

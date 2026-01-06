@@ -13,6 +13,8 @@ const HasilDiagnosa = () => {
   const [openRekomendasi, setOpenRekomendasi] = useState({});
 
   const hasilCF = state?.hasilCF || [];
+  console.log(dataRiwayat);
+  
 
 
   useEffect(() => {
@@ -88,11 +90,11 @@ const HasilDiagnosa = () => {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold text-[#467D40] mb-6 text-center">
-        Hasil Diagnosa
+        Hasil Diagnosis
       </h1>
 
       {loading ? (
-        <p className="text-center">Memuat hasil diagnosa...</p>
+        <p className="text-center">Memuat hasil diagnosis...</p>
       ) : dataRiwayat.length === 0 ? (
         <p className="text-red-500 text-center">
           Tidak ditemukan penyakit yang cocok.
@@ -115,7 +117,7 @@ const HasilDiagnosa = () => {
                   </h2>
 
                   <p className="text-red-500 font-bold text-center text-4xl">
-                    {(row.cf * 100).toFixed(0)}%
+                    {(row.cf * 100).toFixed(2)}%
                   </p>
                 </div>
 
@@ -123,7 +125,7 @@ const HasilDiagnosa = () => {
                   <p>
                     Sapi Anda Menderita Penyakit <b>{row.penyakit}</b> dengan
                     Presentase Tingkat Keyakinan{" "}
-                    <b>{(row.cf * 100).toFixed(0)}%</b>
+                    <b>{(row.cf * 100).toFixed(2)}%</b>
                   </p>
                 </div>
 

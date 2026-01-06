@@ -46,7 +46,7 @@ const Sidebar = () => {
     { label: "Beranda", link: "/beranda" },
     { label: "Diagnosis", link: "/diagnosis" },
     { label: "Riwayat Diagnosis", link: "/riwayat-diagnosis" },
-    { label: "Bantuan", link: "/bantuan" },
+    // { label: "Bantuan", link: "/bantuan" },
   ];
 
   // Tentukan menu berdasarkan role

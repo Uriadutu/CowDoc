@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { db } from "../../auth/Firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  getDocs,
+  query,
+  where,
+  collection,
+} from "firebase/firestore";
 import { motion } from "framer-motion";
 
 const EditPenyakitModal = ({ setIsOpenModalEdit, penyakit, onUpdate }) => {
@@ -8,7 +15,6 @@ const EditPenyakitModal = ({ setIsOpenModalEdit, penyakit, onUpdate }) => {
   const [nama, setNama] = useState(penyakit?.nama || "");
   const [deskripsi, setDeskripsi] = useState(penyakit?.deskripsi || "");
   const [loading, setLoading] = useState(false);
-
   const handleEditPenyakit = async (e) => {
     e.preventDefault();
 
@@ -18,11 +24,31 @@ const EditPenyakitModal = ({ setIsOpenModalEdit, penyakit, onUpdate }) => {
     }
 
     setLoading(true);
+
     try {
+      const kodeTrim = kode.trim();
+
+      const q = query(
+        collection(db, "penyakit"),
+        where("kode", "==", kodeTrim)
+      );
+
+      const snap = await getDocs(q);
+
+      const kodeDipakaiPenyakitLain = snap.docs.some(
+        (docSnap) => docSnap.id !== penyakit.id
+      );
+
+      if (kodeDipakaiPenyakitLain) {
+        alert("Kode penyakit sudah digunakan oleh penyakit lain.");
+        setLoading(false);
+        return;
+      }
+
       const penyakitRef = doc(db, "penyakit", penyakit.id);
       await updateDoc(penyakitRef, {
-        kode,
-        nama,
+        kode: kodeTrim,
+        nama: nama.trim(),
         deskripsi,
         updatedAt: new Date(),
       });
@@ -33,6 +59,7 @@ const EditPenyakitModal = ({ setIsOpenModalEdit, penyakit, onUpdate }) => {
       console.error("Error mengedit penyakit:", error);
       alert("Gagal mengedit penyakit");
     }
+
     setLoading(false);
   };
 
@@ -62,7 +89,6 @@ const EditPenyakitModal = ({ setIsOpenModalEdit, penyakit, onUpdate }) => {
           <div className="bg-white rounded border border-[#048FBD]">
             <div className="p-6 space-y-5 text-gray-700">
               <div className="grid grid-cols-5 gap-4">
-
                 {/* KODE */}
                 <label className="text-sm font-medium">Kode Penyakit</label>
                 <input
@@ -84,7 +110,9 @@ const EditPenyakitModal = ({ setIsOpenModalEdit, penyakit, onUpdate }) => {
                 <div className="col-span-2"></div>
 
                 {/* DESKRIPSI */}
-                <label className="text-sm font-medium">Deskripsi Penyakit</label>
+                <label className="text-sm font-medium">
+                  Deskripsi Penyakit
+                </label>
                 <textarea
                   rows={5}
                   value={deskripsi}

@@ -129,7 +129,7 @@ const RiwayatModal = ({ isOpen, onClose, data }) => {
                       {h.penyakitKode} - {h.penyakitNama}
                     </p>
                     <p className="text-red-500 font-bold">
-                      Keyakinan: {(h.cf * 100).toFixed(0)}%
+                      Keyakinan: {(h.cf * 100).toFixed(2)}%
                     </p>
 
                     {h.rekomendasiDetail.length > 0 && (

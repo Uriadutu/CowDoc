@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { db } from "../../auth/Firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import { motion } from "framer-motion";
 
 const AddPenyakitModal = ({ setIsOpenModalAdd }) => {
@@ -8,7 +8,6 @@ const AddPenyakitModal = ({ setIsOpenModalAdd }) => {
   const [nama, setNama] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
   const [loading, setLoading] = useState(false);
-
   const handleTambahPenyakit = async (e) => {
     e.preventDefault();
 
@@ -18,10 +17,24 @@ const AddPenyakitModal = ({ setIsOpenModalAdd }) => {
     }
 
     setLoading(true);
+
     try {
+      const q = query(
+        collection(db, "penyakit"),
+        where("kode", "==", kode.trim())
+      );
+
+      const snap = await getDocs(q);
+
+      if (!snap.empty) {
+        alert("Kode penyakit sudah digunakan. Gunakan kode lain.");
+        setLoading(false);
+        return;
+      }
+
       await addDoc(collection(db, "penyakit"), {
-        kode,
-        nama,
+        kode: kode.trim(),
+        nama: nama.trim(),
         deskripsi,
         createdAt: new Date(),
       });
@@ -34,6 +47,7 @@ const AddPenyakitModal = ({ setIsOpenModalAdd }) => {
       console.error("Error menambahkan penyakit:", error);
       alert("Gagal menambahkan penyakit");
     }
+
     setLoading(false);
   };
 
@@ -46,10 +60,12 @@ const AddPenyakitModal = ({ setIsOpenModalAdd }) => {
           exit={{ opacity: 0, y: -40 }}
           transition={{ duration: 0.3 }}
           className="w-[900px] max-w-5xl mx-auto rounded-lg"
-        >          
+        >
           {/* HEADER */}
           <div className="flex items-start justify-between p-5 border border-gray-400 bg-[#04BD51] rounded mb-1">
-            <h3 className="text-xl font-semibold text-white">Tambah Penyakit</h3>
+            <h3 className="text-xl font-semibold text-white">
+              Tambah Penyakit
+            </h3>
             <button
               type="button"
               onClick={() => setIsOpenModalAdd(false)}
@@ -63,7 +79,6 @@ const AddPenyakitModal = ({ setIsOpenModalAdd }) => {
           <div className="bg-white rounded border border-[#04BD51]">
             <div className="p-6 space-y-5 text-gray-700">
               <div className="grid grid-cols-5 gap-4">
-
                 {/* KODE */}
                 <label className="text-sm font-medium">Kode Penyakit</label>
                 <input
@@ -85,7 +100,9 @@ const AddPenyakitModal = ({ setIsOpenModalAdd }) => {
                 <div className="col-span-2"></div>
 
                 {/* DESKRIPSI */}
-                <label className="text-sm font-medium">Deskripsi Penyakit</label>
+                <label className="text-sm font-medium">
+                  Deskripsi Penyakit
+                </label>
                 <textarea
                   rows={5}
                   value={deskripsi}

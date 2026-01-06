@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { db } from "../../auth/Firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { motion } from "framer-motion";
 
 const EditGejalaModal = ({ setIsOpenModalEdit, gejala, onUpdate }) => {
@@ -8,7 +15,6 @@ const EditGejalaModal = ({ setIsOpenModalEdit, gejala, onUpdate }) => {
   const [namaGejala, setNamaGejala] = useState(gejala?.nama || "");
   const [terkaitGejala, setTerkaitGejala] = useState(gejala?.terkait || "");
   const [loading, setLoading] = useState(false);
-
   const handleEditGejala = async (e) => {
     e.preventDefault();
 
@@ -18,11 +24,26 @@ const EditGejalaModal = ({ setIsOpenModalEdit, gejala, onUpdate }) => {
     }
 
     setLoading(true);
+
     try {
+      const kodeTrim = kodeGejala.trim().toUpperCase();
+
+      const q = query(collection(db, "gejala"), where("kode", "==", kodeTrim));
+
+      const snap = await getDocs(q);
+
+      const bentrok = snap.docs.find((d) => d.id !== gejala.id);
+
+      if (bentrok) {
+        alert("Kode gejala sudah digunakan oleh gejala lain.");
+        setLoading(false);
+        return;
+      }
+
       const gejalaRef = doc(db, "gejala", gejala.id);
       await updateDoc(gejalaRef, {
-        kode: kodeGejala,
-        nama: namaGejala,
+        kode: kodeTrim,
+        nama: namaGejala.trim(),
         terkait: terkaitGejala,
         updatedAt: new Date(),
       });
@@ -33,6 +54,7 @@ const EditGejalaModal = ({ setIsOpenModalEdit, gejala, onUpdate }) => {
       console.error("Error mengedit gejala:", error);
       alert("Gagal mengedit gejala");
     }
+
     setLoading(false);
   };
 
@@ -67,7 +89,6 @@ const EditGejalaModal = ({ setIsOpenModalEdit, gejala, onUpdate }) => {
           <div className="bg-white rounded border border-[#048FBD]">
             <div className="p-6 space-y-5 text-gray-700">
               <div className="grid items-center grid-cols-5 gap-4">
-
                 {/* KODE GEJALA */}
                 <label className="text-sm font-medium text-gray-700">
                   Kode Gejala

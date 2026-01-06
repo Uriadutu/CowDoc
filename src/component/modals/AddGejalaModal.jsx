@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { db } from "../../auth/Firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import { motion } from "framer-motion";
 
 const AddGejalaModal = ({ setIsOpenModalAdd }) => {
@@ -10,33 +10,50 @@ const AddGejalaModal = ({ setIsOpenModalAdd }) => {
   const [loading, setLoading] = useState(false);
 
   const handleTambahGejala = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!kodeGejala.trim() || !namaGejala.trim()) {
-      alert("Kode dan Nama gejala wajib diisi");
+  if (!kodeGejala.trim() || !namaGejala.trim()) {
+    alert("Kode dan Nama gejala wajib diisi");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const kodeTrim = kodeGejala.trim().toUpperCase();
+
+    const q = query(
+      collection(db, "gejala"),
+      where("kode", "==", kodeTrim)
+    );
+
+    const snap = await getDocs(q);
+
+    if (!snap.empty) {
+      alert("Kode gejala sudah digunakan. Gunakan kode lain.");
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
-    try {
-      await addDoc(collection(db, "gejala"), {
-        kode: kodeGejala,
-        nama: namaGejala,
-        terkait: terkaitGejala,
-        createdAt: new Date(),
-      });
+    await addDoc(collection(db, "gejala"), {
+      kode: kodeTrim,
+      nama: namaGejala.trim(),
+      terkait: terkaitGejala,
+      createdAt: new Date(),
+    });
 
-      setKodeGejala("");
-      setNamaGejala("");
-      setTerkaitGejala("");
+    setKodeGejala("");
+    setNamaGejala("");
+    setTerkaitGejala("");
+    setIsOpenModalAdd(false);
+  } catch (error) {
+    console.error("Error menambahkan gejala:", error);
+    alert("Gagal menambahkan gejala");
+  }
 
-      setIsOpenModalAdd(false);
-    } catch (error) {
-      console.error("Error menambahkan gejala:", error);
-      alert("Gagal menambahkan gejala");
-    }
-    setLoading(false);
-  };
+  setLoading(false);
+};
+
 
   return (
     <div
@@ -69,7 +86,6 @@ const AddGejalaModal = ({ setIsOpenModalAdd }) => {
           <div className="bg-white rounded-xl border border-[#04BD51]">
             <div className="p-6 space-y-5 text-gray-700">
               <div className="grid items-center grid-cols-5 gap-4">
-                
                 {/* KODE GEJALA */}
                 <label className="text-sm font-medium text-gray-700">
                   Kode Gejala

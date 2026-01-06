@@ -122,19 +122,21 @@ const DataPenyakit = () => {
                     </td>
 
                     <td className="border px-4 py-2 text-center">
-                      <button
-                        onClick={() => handleEditPenyakit(p)}
-                        className="text-white bg-blue-500 p-1 hover:underline mr-2"
-                      >
-                        <IoPencil />
-                      </button>
+                      <div className="flex">
+                        <button
+                          onClick={() => handleEditPenyakit(p)}
+                          className="text-white bg-blue-500 p-1 hover:underline mr-2"
+                        >
+                          <IoPencil />
+                        </button>
 
-                      <button
-                        onClick={() => handleDelete(p.id)}
-                        className="text-white bg-red-500 p-1 hover:underline"
-                      >
-                        <IoTrash />
-                      </button>
+                        <button
+                          onClick={() => handleDelete(p.id)}
+                          className="text-white bg-red-500 p-1 hover:underline"
+                        >
+                          <IoTrash />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
