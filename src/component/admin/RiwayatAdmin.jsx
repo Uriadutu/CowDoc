@@ -31,7 +31,7 @@ const RiwayatAdmin = () => {
   }, []);
 
   const filteredUsers = users.filter((u) =>
-    (u.name || "")
+    (u.nama || "")
       .toLowerCase()
       .includes(searchTerm.toLowerCase())
   );
