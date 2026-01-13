@@ -31,7 +31,7 @@ const RiwayatUser = () => {
 
       const snap = await getDocs(q);
 
-      const data = await Promise.all(
+      let data = await Promise.all(
         snap.docs.map(async (docSnap) => {
           const d = docSnap.data();
 
@@ -51,6 +51,7 @@ const RiwayatUser = () => {
 
           return {
             id: docSnap.id,
+            createdAt: d.createdAt?.toDate() || new Date(0), // ⬅️ simpan Date
             tanggal: formatTanggal(d.createdAt.toDate()),
             penyakit: namaPenyakit,
             cf: hasilTerbesar.cf,
@@ -59,6 +60,9 @@ const RiwayatUser = () => {
           };
         })
       );
+
+      // ✅ SORT PALING BARU DI ATAS
+      data.sort((a, b) => b.createdAt - a.createdAt);
 
       setDataRiwayat(data);
     } catch (err) {
