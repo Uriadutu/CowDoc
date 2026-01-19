@@ -20,6 +20,7 @@ function App() {
         <Route path="/masuk" element={<Login />} />
         <Route path="/daftar" element={<Regis />} />
         {/* Protected routes */}
+
         <Route
           path="/beranda"
           element={
